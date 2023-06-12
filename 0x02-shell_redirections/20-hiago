@@ -1,2 +1,2 @@
 #!/bin/bash
-output=$(echo "input" | tr -d 'Ac')
+tr -d "cC"

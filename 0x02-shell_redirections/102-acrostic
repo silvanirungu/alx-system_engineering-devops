@@ -1,2 +1,2 @@
 #!/bin/bash
-first_char="${line:0:1}"
+cut -c 1 | paste -s -d
