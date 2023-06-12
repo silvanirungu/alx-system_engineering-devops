@@ -1,0 +1,2 @@
+#!/bin/bash
+mapfile -t -n 3 lines < iacta
