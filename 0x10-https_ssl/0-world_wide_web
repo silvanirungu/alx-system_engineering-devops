@@ -1,24 +1,16 @@
 #!/usr/bin/env bash
-# get the record type of a domain
-if [[ $# -eq 2 ]]; then
-    dig_res=$(dig -t A "$2" | awk '/ANSWER SECTION/ {getline; print}')
-    echo "$dig_res" | while read -ra token;
-    do
-        unset IFS
-        IFS='.' read -ra subdomain <<< "${token[0]}"
-        echo "The subdomain ${subdomain[0]} is a ${token[3]} record and points to ${token[4]}"
-    done
-fi
-if [[ $# -eq 1 ]]; then
-    subs=('www' 'lb-01' 'web-01' 'web-02')
-    for sub in "${subs[@]}";
-    do
-        dig_res=$(dig -t A "$sub.$1" | awk '/ANSWER SECTION/ {getline; print}')
-        echo "$dig_res" | while read -ra token;
-        do
-            unset IFS
-            IFS='.' read -ra subdomain <<< "${token[0]}"
-            echo "The subdomain $sub is a ${token[3]} record and points to ${token[4]}"
-        done
-    done
+# print domains and subdomains
+
+print_domain_subdomain () {
+    dig "$1" | grep -A1 'ANSWER SECTION:' | sed -r "s/$1./$2/g" | awk -F" " ' NR==2 { print "The subdomain " $1 " is a " $4 " record and points to " $5 }'
+}
+
+if [ "$#" -eq 2 ]
+then
+    print_domain_subdomain "$2.$1" "$2"
+else
+    print_domain_subdomain "www.$1" "www"
+    print_domain_subdomain "lb-01.$1" "lb-01"
+    print_domain_subdomain "web-01.$1" "web-01"
+    print_domain_subdomain "web-02.$1" "web-02"
 fi
